@@ -1,0 +1,71 @@
+services:
+  # ── Go API + Agent Orchestrator ──────────────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DATABASE_URL=file:/data/vanguard.db?cache=shared&mode=rwc&_journal_mode=WAL
+      - GIN_MODE=release
+    volumes:
+      - db_data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # ── TypeScript LangGraph Agent Workers ───────────────────────────────────────
+  agents:
+    build:
+      context: ./agents
+      dockerfile: Dockerfile
+    environment:
+      - BACKEND_URL=http://backend:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-sk-placeholder}
+      - POLL_INTERVAL_MS=5000
+      - NODE_ENV=production
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── React Dashboard (served via Nginx) ───────────────────────────────────────
+  dashboard:
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=
+        - VITE_WS_URL=
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ── Eval Suite (runs once on startup, then on demand) ───────────────────────
+  eval:
+    build:
+      context: ./eval
+      dockerfile: Dockerfile
+    environment:
+      - BACKEND_URL=http://backend:8080
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+    depends_on:
+      backend:
+        condition: service_healthy
+    profiles:
+      - eval  # Run with: docker compose --profile eval up eval
+    restart: "no"
+
+volumes:
+  db_data:
+
+networks:
+  default:
+    name: vanguard-cx

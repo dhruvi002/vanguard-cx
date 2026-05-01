@@ -1,0 +1,28 @@
+# Go
+backend/vanguard-server
+backend/*.db
+backend/*.db-shm
+backend/*.db-wal
+*.db
+
+# Node
+node_modules/
+agents/dist/
+dashboard/dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+eval/reports/*.json
+eval/cases/test_cases.json
+
+# Env
+.env
+.env.local
+
+# Docker
+.dockerignore
+
+# OS
+.DS_Store

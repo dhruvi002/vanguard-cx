@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Go backend ───────────────────────────────────────────────────────────────
+  backend:
+    name: Go Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: { go-version: '1.22' }
+      - name: Install deps
+        working-directory: backend
+        run: go mod download
+      - name: Build
+        working-directory: backend
+        run: CGO_ENABLED=1 go build ./cmd/server/
+      - name: Vet
+        working-directory: backend
+        run: go vet ./...
+
+  # ── TypeScript agents ─────────────────────────────────────────────────────────
+  agents:
+    name: TypeScript Agents
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install
+        working-directory: agents
+        run: npm ci
+      - name: Typecheck
+        working-directory: agents
+        run: npm run typecheck
+
+  # ── React dashboard ───────────────────────────────────────────────────────────
+  dashboard:
+    name: React Dashboard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - name: Install
+        working-directory: dashboard
+        run: npm ci
+      - name: Build
+        working-directory: dashboard
+        run: npm run build
+
+  # ── DeepEval suite (offline / simulation mode) ────────────────────────────────
+  eval:
+    name: DeepEval Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: '3.12' }
+      - name: Install
+        working-directory: eval
+        run: pip install -r requirements.txt
+      - name: Generate cases
+        working-directory: eval
+        run: python runners/generate_cases.py
+      - name: Run eval suite
+        working-directory: eval
+        run: python runners/run_eval.py
+        # Exits with code 1 if success rate < 90%
