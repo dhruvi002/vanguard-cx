@@ -2,7 +2,7 @@
 
 **Autonomous CX Multi-Agent Platform** — a high-agency agentic system that resolves complex customer support tickets end-to-end without human intervention.
 
-[![CI](https://github.com/YOUR_USERNAME/vanguard-cx/actions/workflows/ci.yml/badge.svg)](https://github.com/YOUR_USERNAME/vanguard-cx/actions)
+[![CI](https://github.com/dhruvi002/vanguard-cx/actions/workflows/ci.yml/badge.svg)](https://github.com/dhruvi002/vanguard-cx/actions)
 ![Go](https://img.shields.io/badge/Go-1.22-00ADD8?logo=go)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript)
 ![LangGraph](https://img.shields.io/badge/LangGraph-0.2-412991)
@@ -130,7 +130,7 @@ Results: **92%+ pass rate** across 500 cases. CI fails if rate drops below 90%.
 ### One command
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/vanguard-cx
+git clone https://github.com/dhruvi002/vanguard-cx
 cd vanguard-cx
 
 # Start everything
@@ -142,14 +142,6 @@ docker compose up
 ```
 
 The backend **auto-seeds** a SQLite DB with synthetic customers, orders, and charges, then begins generating tickets every 20–45 seconds for a live demo.
-
-### With OpenAI (live LLM agents)
-
-```bash
-OPENAI_API_KEY=sk-... docker compose up
-```
-
-Without a key, agents use the Go orchestrator's deterministic tool executor (fully functional for demos).
 
 ### Local development (no Docker)
 
@@ -290,33 +282,6 @@ vanguard-cx/
 
 ---
 
-## 🌐 Free Deployment (Zero Cost)
-
-| Service | Platform | Cost |
-|---|---|---|
-| Go backend | [Railway](https://railway.app) | Free tier |
-| React dashboard | [Vercel](https://vercel.com) | Free tier |
-| SQLite data | Railway persistent volume | Free tier |
-| CI/CD | GitHub Actions | Free |
-
-### Deploy to Railway (backend)
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-railway login
-cd backend
-railway up
-```
-
-### Deploy dashboard to Vercel
-```bash
-npm install -g vercel
-cd dashboard
-VITE_API_URL=https://your-railway-app.up.railway.app vercel --prod
-```
-
----
-
 ## 📈 Key Results
 
 - **92% success rate** across 500+ adversarial synthetic test cases
@@ -341,9 +306,3 @@ VITE_API_URL=https://your-railway-app.up.railway.app vercel --prod
 
 **Connect a real database:**
 Set `DATABASE_URL` to a Postgres connection string — the DB layer uses `database/sql` so it's driver-agnostic (swap `go-sqlite3` for `lib/pq`).
-
----
-
-## 📄 License
-
-MIT — built as a portfolio project demonstrating production-grade agentic systems.
